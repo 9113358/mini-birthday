@@ -3,73 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Mini ✨</title>
+    <title>A Secret for Mini ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #1a0033; }
+        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #0f001a; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--royal); color: white; font-family: 'Poppins', sans-serif; }
 
-        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; background: radial-gradient(circle, #2e004e 0%, #110022 100%); z-index: 10; }
+        /* Timer Screen */
+        #timer-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .timer-digits { font-size: 3rem; font-weight: bold; color: var(--gold); text-shadow: 0 0 20px var(--gold); letter-spacing: 5px; }
+
+        /* Magic Pages */
+        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; background: radial-gradient(circle, #2e004e 0%, #0f001a 100%); z-index: 10; }
         .active { display: flex; }
 
-        /* Smoke/Cloud Effect */
-        .smoke-wrap { position: absolute; bottom: 0; width: 100%; height: 200px; overflow: hidden; pointer-events: none; opacity: 0.4; }
-        .smoke { position: absolute; bottom: -50px; width: 300px; height: 300px; background: radial-gradient(circle, #ffffff33 0%, #ffffff00 70%); border-radius: 50%; filter: blur(30px); animation: smokeMove 8s infinite alternate; }
-        @keyframes smokeMove { from { transform: translateX(-100px); } to { transform: translateX(100vw); } }
+        /* Smoke/Cloud Layer */
+        .smoke-wrap { position: absolute; bottom: 0; width: 100%; height: 250px; overflow: hidden; pointer-events: none; opacity: 0.3; }
+        .smoke { position: absolute; bottom: -50px; width: 400px; height: 400px; background: radial-gradient(circle, #ffffff33 0%, #ffffff00 70%); border-radius: 50%; filter: blur(40px); animation: smokeMove 10s infinite alternate; }
+        @keyframes smokeMove { from { transform: translateX(-200px); } to { transform: translateX(100vw); } }
 
-        /* Characters */
+        /* Character Animations */
         .character-container { position: relative; width: 220px; height: 220px; overflow: hidden; }
         .walking-boy { width: 180px; position: absolute; left: -300px; transition: left 3.5s ease-out; z-index: 20; }
         .walk-in { left: 20px !important; }
 
-        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 18px 45px; color: white; font-size: 1.2rem; border-radius: 50px; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--pink); font-weight: bold; }
-        
-        /* Floating Icons */
-        .float-item { position: absolute; pointer-events: none; z-index: 5; animation: floatUp 7s linear infinite; }
-        @keyframes floatUp { 0% { bottom: -10%; opacity: 1; } 100% { bottom: 110%; opacity: 0; } }
+        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 18px 45px; color: white; font-size: 1.2rem; border-radius: 50px; cursor: pointer; z-index: 100; font-weight: bold; box-shadow: 0 0 15px var(--pink); transition: 0.3s; }
+        .magic-btn:active { transform: scale(0.9); }
 
         .cake-page { cursor: url('knife.png'), pointer !important; }
-        .glowing-text { font-size: 3rem; text-shadow: 0 0 15px var(--pink); animation: pulse 2s infinite alternate; }
+        .glowing-text { font-size: 3.5rem; text-shadow: 0 0 20px var(--pink); animation: pulse 2s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.08); } }
+        
+        .float-item { position: absolute; pointer-events: none; z-index: 5; animation: floatUp 7s linear infinite; }
+        @keyframes floatUp { 0% { bottom: -10%; opacity: 1; } 100% { bottom: 110%; opacity: 0; } }
     </style>
 </head>
 <body>
 
 <audio id="bgMusic" loop src="birthday_song.mp3"></audio>
 
-<div id="page1" class="page active">
-    <h1 class="animate__animated animate__fadeIn">Welcome, Mini! ✨</h1>
+<div id="timer-screen">
+    <h1 class="animate__animated animate__pulse animate__infinite">Something Magic is Coming...</h1>
+    <p>Unlock for Mini in:</p>
+    <div class="timer-digits" id="countdown">00:00:00</div>
+    <p style="margin-top: 20px; color: #555;">March 28, 2026 | 04:45 PM</p>
+</div>
+
+<div id="page1" class="page">
+    <h1 class="animate__animated animate__fadeIn">It's Time! ✨</h1>
     <div id="setup-ui">
-        <p>This surprise needs your voice & magic.</p>
+        <p>This surprise needs your voice. Click to enter.</p>
         <button class="magic-btn" onclick="startMic()">START THE MAGIC</button>
     </div>
     
     <div id="mic-ui" style="display:none;">
-        <div id="candles" style="font-size: 80px; margin-bottom: 10px;">🕯️🕯️🕯️</div>
-        <p id="mic-hint">Now... <b>BLOW</b> at the bottom of your phone!</p>
-        <div id="mic-status" style="font-size: 0.9rem; color: var(--gold);">Waiting for breath...</div>
+        <div id="candles" style="font-size: 80px;">🕯️🕯️🕯️</div>
+        <p>Now... <b>BLOW</b> at the bottom of your phone!</p>
+        <div id="mic-status" style="color: var(--gold); font-size: 0.9rem;">Waiting for breath...</div>
     </div>
 
     <div id="wish-box" style="display:none;" class="animate__animated animate__zoomIn">
-        <h2 style="padding: 20px;">"Wishing you many more candles to blow and a year filled with joy."</h2>
-        <button class="magic-btn" onclick="nextPage(2)">Continue →</button>
+        <h2>"Wishing you many more candles to blow and a year filled with joy."</h2>
+        <button class="magic-btn" onclick="nextPage(2)">Open Surprise →</button>
     </div>
 </div>
 
 <div id="page2" class="page cake-page">
-    <div class="smoke-wrap"><div class="smoke"></div><div class="smoke" style="animation-delay: 4s;"></div></div>
+    <div class="smoke-wrap"><div class="smoke"></div><div class="smoke" style="animation-delay: 5s;"></div></div>
     <div class="character-container"><img src="boy_with_cake.gif" class="walking-boy" id="cake-boy"></div>
     <div id="cake-ui" style="display:none;">
-        <h1>A Sweet Surprise!</h1>
+        <h1>A Sweet Treat!</h1>
         <div id="cake-img" style="font-size: 130px; cursor: pointer;" onclick="cutCake()">🎂</div>
-        <p id="cake-msg" style="color: var(--gold); font-weight: bold; font-size: 1.2rem;"></p>
+        <p id="cake-msg" style="color: var(--gold); font-weight: bold;"></p>
         <button id="cake-next" class="magic-btn" style="display:none" onclick="nextPage(3)">Next ✉️</button>
     </div>
 </div>
 
 <div id="page3" class="page">
-    <div id="flower-layer"></div>
     <div class="character-container"><img src="boy_delivery.gif" class="walking-boy" id="letter-boy"></div>
     <div id="letter-ui" style="display:none;">
         <button class="magic-btn" onclick="openLetter()">Read My Message</button>
@@ -89,7 +100,7 @@
         <button id="no-btn" class="magic-btn" style="background: #444;" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
         <div id="gift-final" style="display:none; margin-top: 20px;">
             <h2>Your gift is on the way! 📦</h2>
-            <p>Ready to meet me for the real surprise? 😉</p>
+            <p>Meet me for the real surprise! 😉</p>
             <button class="magic-btn" onclick="nextPage(5)">THE FINALE 🎉</button>
         </div>
     </div>
@@ -103,18 +114,42 @@
 </div>
 
 <script>
-    let audioCtx;
-    let analyser;
-    let data;
+    // --- 1. COUNTDOWN TIMER LOGIC ---
+    const targetDate = new Date("March 28, 2026 16:45:00").getTime();
+
+    const timerInterval = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML = 
+            (h < 10 ? "0"+h : h) + ":" + (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+
+        if (distance < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timer-screen").style.display = "none";
+            document.getElementById("page1").classList.add("active");
+        }
+    }, 1000);
+
+    // --- 2. VIBRATION HELPER ---
+    function vibrate(ms) {
+        if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    // --- 3. MAGIC LOGIC ---
+    let audioCtx, analyser, data;
 
     function startMic() {
         document.getElementById('setup-ui').style.display = 'none';
         document.getElementById('mic-ui').style.display = 'block';
         document.getElementById('bgMusic').play();
+        vibrate(100);
 
-        // Mobile Fix: Initialize Audio Context on user click
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
             const source = audioCtx.createMediaStreamSource(stream);
             analyser = audioCtx.createAnalyser();
@@ -122,42 +157,32 @@
             source.connect(analyser);
             data = new Uint8Array(analyser.frequencyBinCount);
             detectBlow();
-        }).catch(err => {
-            document.getElementById('mic-status').innerHTML = "Mic Blocked. Tap candles to blow!";
-            document.getElementById('candles').onclick = blowManual;
         });
     }
 
     function detectBlow() {
         analyser.getByteFrequencyData(data);
-        let sum = 0;
-        for(let i=0; i<data.length; i++) sum += data[i];
+        let sum = data.reduce((a, b) => a + b, 0);
         let average = sum / data.length;
-
-        // Visual feedback
-        if(average > 10) document.getElementById('mic-status').innerText = "Hearing something...";
-
-        if (average > 35) { // Lowered threshold for mobile
-            blowManual();
+        if (average > 35) {
+            vibrate([200, 100, 200]); // Long pulse
+            document.getElementById('candles').innerHTML = "💨🕯️";
+            document.getElementById('wish-box').style.display = "block";
+            document.getElementById('mic-ui').style.display = "none";
+            confetti();
         } else {
             requestAnimationFrame(detectBlow);
         }
     }
 
-    function blowManual() {
-        document.getElementById('candles').innerHTML = "💨🕯️";
-        document.getElementById('wish-box').style.display = "block";
-        document.getElementById('mic-ui').style.display = "none";
-        confetti();
-    }
-
     function nextPage(n) {
+        vibrate(50);
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page'+n).classList.add('active');
-        if(n === 2) { triggerBoy('cake-boy', 'cake-ui'); spawnItems(['🎈','💖','🎈'], 'page2'); }
-        if(n === 3) { triggerBoy('letter-boy', 'letter-ui'); spawnItems(['🌸','🌺','✨'], 'page3'); }
+        if(n === 2) { triggerBoy('cake-boy', 'cake-ui'); spawnItems(['🎈','💖'], 'page2'); }
+        if(n === 3) { triggerBoy('letter-boy', 'letter-ui'); spawnItems(['🌸','🌺'], 'page3'); }
         if(n === 4) { triggerBoy('gift-boy', 'gift-ui'); }
-        if(n === 5) { setInterval(() => confetti({particleCount: 100, spread: 70, origin: {y: 0.6}}), 2000); }
+        if(n === 5) { setInterval(() => { confetti({particleCount: 100, spread: 70, origin: {y: 0.6}}); vibrate(50); }, 2000); }
     }
 
     function triggerBoy(boyId, uiId) {
@@ -166,6 +191,7 @@
     }
 
     function cutCake() {
+        vibrate(300); // Strong slice pulse
         document.getElementById('cake-img').innerHTML = "🍰🍴";
         document.getElementById('cake-msg').innerText = "Oh! It's butterscotch cake, hope you loved it.";
         document.getElementById('cake-next').style.display = "inline-block";
@@ -173,11 +199,13 @@
     }
 
     function openLetter() {
+        vibrate(100);
         document.getElementById('letter-text').style.display = "block";
         confetti();
     }
 
     function moveNo() {
+        vibrate(20);
         const btn = document.getElementById('no-btn');
         btn.style.position = 'absolute';
         btn.style.left = Math.random() * 70 + '%';
@@ -185,6 +213,7 @@
     }
 
     function acceptGift() {
+        vibrate([100, 50, 100, 50, 300]); // Excitement pulse
         document.getElementById('gift-final').style.display = "block";
         document.getElementById('no-btn').style.display = "none";
         confetti();
@@ -198,7 +227,6 @@
             item.innerHTML = icons[Math.floor(Math.random()*icons.length)];
             item.style.left = Math.random() * 90 + 'vw';
             item.style.animationDelay = Math.random() * 5 + 's';
-            item.style.fontSize = (Math.random() * 20 + 20) + 'px';
             page.appendChild(item);
         }
     }
