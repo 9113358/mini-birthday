@@ -3,230 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Surprise for Mini</title>
+    <title>The Chronicles of Mini's Birthday</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
         :root {
-            --magic-purple: #2e003e;
-            --gold: #ffd700;
-            --pink: #ff7eb9;
+            --gold: #FFD700;
+            --magic-pink: #FF1493;
+            --deep-royal: #1a0033;
         }
 
         body, html {
-            margin: 0; padding: 0;
-            height: 100%; overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            background: var(--magic-purple);
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            overflow: hidden; font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a0033 0%, #4b0082 100%);
             color: white;
         }
 
-        .page {
-            display: none;
-            height: 100vh;
-            width: 100vw;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: absolute;
-            animation: fadeIn 0.8s ease-in-out;
+        /* Magical Background Overlay */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            pointer-events: none; z-index: 1;
         }
 
+        .page {
+            display: none; height: 100vh; width: 100vw;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; position: absolute; z-index: 2;
+        }
         .active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Floating Elements */
-        .floating { animation: float 3s ease-in-out infinite; }
-        @keyframes float { 
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        /* Floating Balloons Animation */
+        .balloon {
+            position: absolute; bottom: -100px; font-size: 50px;
+            animation: floatUp 6s linear infinite;
+        }
+        @keyframes floatUp {
+            to { transform: translateY(-110vh) translateX(50px); opacity: 0; }
         }
 
-        /* Page 1: Candles */
-        .candle-container { font-size: 50px; cursor: pointer; }
-        .mic-btn { 
-            background: var(--gold); border: none; padding: 15px 30px; 
-            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        /* Falling Flowers Animation */
+        .flower {
+            position: absolute; top: -50px; font-size: 30px;
+            animation: fall 5s linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
         }
 
-        /* Page 2: Cake */
-        .cake { font-size: 100px; cursor: pointer; transition: 0.5s; }
-        .cake:active { transform: scale(0.8) rotate(-10deg); }
-
-        /* Page 3: Envelope */
-        .envelope { font-size: 100px; cursor: pointer; transition: 0.5s; }
-        .letter { 
-            background: white; color: black; padding: 20px; 
-            border-radius: 10px; display: none; margin-top: 20px;
+        /* Buttons & UI */
+        .magic-btn {
+            background: linear-gradient(45deg, var(--magic-pink), var(--gold));
+            border: none; padding: 15px 40px; color: white;
+            font-size: 20px; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
+            transition: 0.3s; margin-top: 20px;
         }
+        .magic-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--gold); }
 
-        /* Page 4: Gift Box */
-        #btn-no { transition: 0.2s; }
+        /* Game Styles */
+        #game-container { position: relative; width: 350px; height: 450px; background: rgba(0,0,0,0.3); border: 2px solid var(--gold); border-radius: 15px; }
+        #basket { position: absolute; bottom: 10px; left: 150px; font-size: 40px; transition: 0.1s linear; pointer-events: none; }
+        .falling-item { position: absolute; font-size: 30px; }
 
-        /* Page 5: Game */
-        #game-canvas { background: rgba(255,255,255,0.1); border-radius: 10px; cursor: crosshair; }
-
-        button {
-            padding: 10px 25px;
-            font-size: 18px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            margin: 10px;
-        }
+        h1 { font-size: 3.5rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
+    <div class="overlay"></div>
+    
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="page1" class="page active">
-        <h1 class="floating">Make a Wish, Mini!</h1>
-        <div class="candle-container" id="candles">🕯️🕯️🕯️</div>
-        <p>Click the mic and say "Happy Birthday" or "Blow" to light the magic!</p>
-        <button class="mic-btn" onclick="nextPage(2)">Click to Blow Candles 🌬️</button>
+        <h1 class="animate__animated animate__fadeInDown">Welcome to the Magic, Mini...</h1>
+        <p>Light the candles to begin your journey.</p>
+        <div id="candles" style="font-size: 60px;">🕯️🕯️🕯️</div>
+        <button class="magic-btn" onclick="startExperience()">Ignite the Magic ✨</button>
     </div>
 
     <div id="page2" class="page">
-        <h1>Time for Cake!</h1>
-        <div class="cake" onclick="sliceCake()">🎂</div>
-        <p id="cake-msg">Click the cake to take a slice!</p>
-        <button id="cake-next" style="display:none" onclick="nextPage(3)">It looks delicious! Next →</button>
+        <div id="balloon-zone"></div>
+        <h1 class="animate__animated animate__zoomIn">A Treat for the Queen 🎂</h1>
+        <div id="cake-container" style="font-size: 120px; cursor: pointer;" onclick="sliceCake()">🎂</div>
+        <p id="cake-hint">Click the cake to taste the magic!</p>
+        <button id="next2" class="magic-btn" style="display:none" onclick="nextPage(3)">That was delicious! Next →</button>
     </div>
 
     <div id="page3" class="page">
-        <h1>You have Mail 💌</h1>
-        <div class="envelope" onclick="openEnvelope()">✉️</div>
-        <div id="letter" class="letter">
-            <h3>To my Bestie Mini,</h3>
-            <p>Happy Birthday! You are the most amazing person I know. May this year be as bright as your smile!</p>
-            <button onclick="nextPage(4)">Close & Continue</button>
+        <div id="flower-zone"></div>
+        <h1 class="animate__animated animate__fadeIn">A Secret Letter... 💌</h1>
+        <div style="font-size: 100px; cursor: pointer;" onclick="openLetter()">✉️</div>
+        <div id="letter-content" style="display:none; background: white; color: #333; padding: 30px; border-radius: 15px; max-width: 80%; border: 5px solid var(--gold);">
+            <h2 style="color: var(--magic-pink)">Happy Birthday Mini!</h2>
+            <p>You aren't just my best friend; you're the glitter in my life! Wishing you a day as beautiful as these falling petals.</p>
+            <button class="magic-btn" onclick="nextPage(4)">Open Your Gift Box 🎁</button>
         </div>
     </div>
 
     <div id="page4" class="page">
-        <h1 id="gift-h1">A Surprise Awaits...</h1>
-        <div class="cake floating" style="font-size: 120px;">🎁</div>
-        <p>Do you want this gift?</p>
-        <div id="gift-btns">
-            <button id="btn-yes" style="background: #4CAF50; color: white;" onclick="acceptGift()">YES!</button>
-            <button id="btn-no" style="background: #f44336; color: white;" onmouseover="shrinkNo()">No</button>
+        <h1>Your Special Gift 🎁</h1>
+        <div class="animate__animated animate__pulse animate__infinite" style="font-size: 100px;">📦</div>
+        <p>Do you promise to cherish this gift forever?</p>
+        <div id="gift-controls">
+            <button class="magic-btn" style="background: #4CAF50" onclick="acceptGift()">YES, I DO!</button>
+            <button id="no-btn" class="magic-btn" style="background: #f44336" onmouseover="moveNo()">NO</button>
         </div>
-        <div id="gift-reveal" style="display:none">
-            <p>Your gift is on the way... meet me to get it! 😉</p>
-            <button onclick="nextPage(5)">One more thing... Play a Game!</button>
+        <div id="gift-final" style="display:none">
+            <h2 class="animate__animated animate__bounceIn">It's a Surprise! 💖</h2>
+            <p>Your physical gift is on its way to your doorstep... meet me soon to claim it!</p>
+            <button class="magic-btn" onclick="nextPage(5)">One Last Game? 🎮</button>
         </div>
     </div>
 
     <div id="page5" class="page">
-        <h1>Catch the Love! ❤️</h1>
-        <p>Score: <span id="score">0</span> | Time: <span id="timer">20</span>s</p>
-        <canvas id="game-canvas" width="350" height="400"></canvas>
-        <div id="game-over" style="display:none">
-            <h2 id="final-msg"></h2>
-            <button onclick="nextPage(6)">Finish Surprise ✨</button>
+        <h1>Catch the Love, Mini!</h1>
+        <p>Move your mouse/finger to catch treats in the basket!</p>
+        <div id="game-container">
+            <div id="basket">🧺</div>
         </div>
+        <p>Score: <span id="score">0</span> | Time: <span id="timer">20</span>s</p>
+        <button id="finish-btn" class="magic-btn" style="display:none" onclick="nextPage(6)">See the Grand Finale!</button>
     </div>
 
     <div id="page6" class="page">
-        <h1 style="font-size: 50px; color: var(--gold);">HAPPY BIRTHDAY MINI! 🎊</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJqZzR2ZzR2ZzR2ZzR2ZzR2ZzR2ZzR2ZzR2ZzR2ZzR2/l41lTfuxV6mN1D4-Y/giphy.gif" width="300">
-        <p>Stay Sparkly & Amazing!</p>
-        <button onclick="location.reload()">See it Again ❤️</button>
+        <h1 class="animate__animated animate__jackInTheBox" style="color: var(--gold); font-size: 4rem;">HAPPY BIRTHDAY MINI! 🎊</h1>
+        <p style="font-size: 24px;">You caught all the happiness today!</p>
+        <div style="font-size: 100px;">🎆✨🎇</div>
+        <button class="magic-btn" onclick="location.reload()">Replay the Magic ❤️</button>
     </div>
 
     <script>
+        const bgMusic = document.getElementById('bgMusic');
+
+        function startExperience() {
+            bgMusic.play();
+            nextPage(2);
+            createBalloons();
+        }
+
         function nextPage(num) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page' + num).classList.add('active');
-            if(num === 5) startGame();
-            if(num === 6) fireworkEffect();
+            if(num === 3) createFlowers();
+            if(num === 5) startCatchGame();
+            if(num === 6) {
+                setInterval(() => {
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                }, 1000);
+            }
         }
 
-        // Page 2 Logic
+        // Page 2: Balloons
+        function createBalloons() {
+            const zone = document.getElementById('balloon-zone');
+            const icons = ['🎈', '💖', '✨'];
+            for(let i=0; i<15; i++) {
+                let b = document.createElement('div');
+                b.className = 'balloon';
+                b.innerHTML = icons[Math.floor(Math.random()*icons.length)];
+                b.style.left = Math.random() * 90 + 'vw';
+                b.style.animationDelay = Math.random() * 5 + 's';
+                zone.appendChild(b);
+            }
+        }
+
         function sliceCake() {
-            document.querySelector('.cake').innerHTML = '🍰';
-            document.getElementById('cake-msg').innerText = "Hope it's tasty and you like it! ✨";
-            document.getElementById('cake-next').style.display = 'block';
+            document.getElementById('cake-container').innerHTML = "🍰✨";
+            document.getElementById('cake-hint').innerHTML = "<b>Hope it's the sweetest year yet! You deserve it!</b>";
+            document.getElementById('next2').style.display = "block";
             confetti();
         }
 
-        // Page 3 Logic
-        function openEnvelope() {
-            document.querySelector('.envelope').innerHTML = '📂';
-            document.getElementById('letter').style.display = 'block';
+        // Page 3: Flowers
+        function createFlowers() {
+            const zone = document.getElementById('flower-zone');
+            const flowers = ['🌸', '🌺', '🌹', '🌷'];
+            for(let i=0; i<20; i++) {
+                let f = document.createElement('div');
+                f.className = 'flower';
+                f.innerHTML = flowers[Math.floor(Math.random()*flowers.length)];
+                f.style.left = Math.random() * 95 + 'vw';
+                f.style.animationDelay = Math.random() * 5 + 's';
+                zone.appendChild(f);
+            }
         }
 
-        // Page 4 Logic
+        function openLetter() {
+            document.getElementById('letter-content').style.display = "block";
+        }
+
+        // Page 4: No Button
         let noScale = 1;
-        function shrinkNo() {
+        function moveNo() {
+            const btn = document.getElementById('no-btn');
             noScale -= 0.15;
-            if(noScale < 0.2) noScale = 0;
-            document.getElementById('btn-no').style.transform = `scale(${noScale})`;
+            btn.style.transform = `scale(${noScale})`;
+            btn.style.position = "absolute";
+            btn.style.left = Math.random() * 80 + '%';
+            btn.style.top = Math.random() * 80 + '%';
+            if(noScale <= 0.1) btn.style.display = "none";
         }
 
         function acceptGift() {
-            document.getElementById('gift-btns').style.display = 'none';
-            document.getElementById('gift-reveal').style.display = 'block';
-            document.getElementById('gift-h1').innerText = "Ready for the surprise?";
+            document.getElementById('gift-controls').style.display = "none";
+            document.getElementById('gift-final').style.display = "block";
             confetti();
         }
 
-        // Page 5: Game Logic
-        function startGame() {
-            const canvas = document.getElementById('game-canvas');
-            const ctx = canvas.getContext('2d');
+        // Page 5: FIXED GAME
+        function startCatchGame() {
+            const container = document.getElementById('game-container');
+            const basket = document.getElementById('basket');
             let score = 0;
             let timeLeft = 20;
-            let items = [];
-            const icons = ['🍫', '❤️', '🎁', '🍭'];
 
-            const gameInterval = setInterval(() => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                if (Math.random() < 0.1) {
-                    items.push({ x: Math.random() * 320, y: 0, icon: icons[Math.floor(Math.random() * icons.length)] });
-                }
-                items.forEach((item, index) => {
-                    item.y += 4;
-                    ctx.font = "30px Arial";
-                    ctx.fillText(item.icon, item.x, item.y);
-                    
-                    // Collision check (simple mouse position)
-                    canvas.onmousemove = (e) => {
-                        const rect = canvas.getBoundingClientRect();
-                        const mx = e.clientX - rect.left;
-                        const my = e.clientY - rect.top;
-                        if (Math.abs(item.x - mx) < 30 && Math.abs(item.y - my) < 30) {
-                            items.splice(index, 1);
-                            score++;
-                            document.getElementById('score').innerText = score;
-                        }
-                    };
-                });
-            }, 30);
+            // Move Basket
+            container.onmousemove = (e) => {
+                let rect = container.getBoundingClientRect();
+                let x = e.clientX - rect.left - 20;
+                if(x > 0 && x < 310) basket.style.left = x + 'px';
+            };
 
-            const timerInterval = setInterval(() => {
+            const gameTimer = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(gameInterval);
-                    clearInterval(timerInterval);
-                    document.getElementById('game-over').style.display = 'block';
-                    document.getElementById('final-msg').innerText = `You caught ${score} treats! Let me know how much you like this!`;
+                if(timeLeft <= 0) {
+                    clearInterval(gameTimer);
+                    document.getElementById('finish-btn').style.display = "block";
                 }
             }, 1000);
-        }
 
-        function fireworkEffect() {
-            var duration = 15 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            const spawnItems = setInterval(() => {
+                if(timeLeft <= 0) { clearInterval(spawnItems); return; }
+                const item = document.createElement('div');
+                item.className = 'falling-item';
+                item.innerHTML = ['🍫', '🍬', '🎁', '💎'][Math.floor(Math.random()*4)];
+                item.style.left = Math.random() * 320 + 'px';
+                item.style.top = '0px';
+                container.appendChild(item);
 
-            var interval = setInterval(function() {
-                var timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
-                var particleCount = 50 * (timeLeft / duration);
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
-            }, 250);
+                let pos = 0;
+                const fall = setInterval(() => {
+                    pos += 5;
+                    item.style.top = pos + 'px';
+                    
+                    // Collision detection
+                    let bLeft = parseInt(basket.style.left);
+                    let iLeft = parseInt(item.style.left);
+                    if(pos > 380 && pos < 420 && Math.abs(iLeft - bLeft) < 40) {
+                        score++;
+                        document.getElementById('score').innerText = score;
+                        item.remove();
+                        clearInterval(fall);
+                    }
+                    if(pos > 450) { item.remove(); clearInterval(fall); }
+                }, 20);
+            }, 600);
         }
     </script>
 </body>
