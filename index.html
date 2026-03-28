@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Magical Journey for Mini</title>
+    <title>For Mini ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #1a0033; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--royal); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #1a0033; --sparkle: rgba(255, 255, 255, 0.8); }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--royal); color: white; font-family: 'Poppins', sans-serif; touch-action: manipulation; }
 
-        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; background: radial-gradient(circle, #2e004e 0%, #110022 100%); }
+        .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; background: radial-gradient(circle, #2e004e 0%, #110022 100%); z-index: 10; }
         .active { display: flex; }
 
-        /* Knife Cursor - Applied via Class on Page 2 */
-        .cake-page { cursor: url('knife.png'), pointer !important; }
+        /* --- New Magical Elements --- */
+        .balloon { position: absolute; bottom: -100px; font-size: 40px; animation: floatUp 8s linear infinite; z-index: 5; pointer-events: none; }
+        @keyframes floatUp { to { transform: translateY(-120vh) translateX(50px); opacity: 0; } }
 
-        /* Character Animations */
-        .character-container { position: relative; width: 250px; height: 250px; margin-bottom: 20px; overflow: hidden; }
-        .walking-boy { width: 200px; position: absolute; left: -300px; transition: left 3s ease-out; }
+        .flower { position: absolute; top: -50px; font-size: 25px; animation: petalFall 6s linear infinite; z-index: 5; pointer-events: none; }
+        @keyframes petalFall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        .glitter { position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; opacity: 0; animation: flash 3s infinite; pointer-events: none; }
+        @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 1; box-shadow: 0 0 10px white; } }
+
+        /* Character & UI */
+        .character-container { position: relative; width: 200px; height: 200px; overflow: hidden; }
+        .walking-boy { width: 150px; position: absolute; left: -300px; transition: left 3s ease-out; }
         .walk-in { left: 25px !important; }
 
-        /* Fancy Glowing Text for Finale */
-        .glowing-text {
-            font-size: 4rem; font-weight: bold; color: #fff;
-            text-shadow: 0 0 10px #fff, 0 0 20px var(--pink), 0 0 40px var(--pink);
-            animation: pulse 2s infinite alternate;
-        }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .cake-page { cursor: url('knife.png'), pointer !important; }
+        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 15px 35px; color: white; font-size: 1rem; border-radius: 50px; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--pink); }
 
-        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 15px 40px; color: white; font-size: 1.1rem; border-radius: 50px; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
-        .letter-paper { background: #fffdf0; color: #333; padding: 30px; border-radius: 5px; box-shadow: 5px 5px 20px rgba(0,0,0,0.5); transform: rotate(-1deg); max-width: 80%; border-left: 10px solid var(--pink); }
+        .glowing-text { font-size: 3.5rem; text-shadow: 0 0 10px #fff, 0 0 20px var(--pink); animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
     </style>
 </head>
 <body>
@@ -39,124 +40,135 @@
 <audio id="bgMusic" loop src="birthday_song.mp3"></audio>
 
 <div id="page1" class="page active">
+    <div id="glitter-layer"></div>
     <h1 class="animate__animated animate__fadeInDown">Happy Birthday, Mini! ✨</h1>
-    <p>Please allow mic access and <b>BLOW</b> into your phone!</p>
-    <div id="candles" style="font-size: 80px;">🕯️🕯️🕯️</div>
-    <div id="mic-hint" style="color: var(--gold); margin-top: 10px;">Waiting for your breath...</div>
+    <p>Tap "Start" then <b>BLOW</b> into the mic!</p>
+    <button class="magic-btn" id="start-btn" onclick="initAudio()">Start Magic 🎙️</button>
+    <div id="candle-box" style="display:none;">
+        <div id="candles" style="font-size: 80px;">🕯️🕯️🕯️</div>
+        <p id="mic-status" style="color: var(--gold);">Waiting for your breath...</p>
+    </div>
     <div id="wish-box" style="display:none;" class="animate__animated animate__zoomIn">
-        <h2 style="padding: 0 20px;">"Wishing you many more candles to blow and a year filled with joy."</h2>
-        <button class="magic-btn" onclick="nextPage(2)">Open Your Surprise →</button>
+        <h2>"Wishing you many more candles to blow and a year filled with joy."</h2>
+        <button class="magic-btn" onclick="nextPage(2)">Open Surprise →</button>
     </div>
 </div>
 
 <div id="page2" class="page cake-page">
-    <div class="character-container">
-        <img src="boy_with_cake.gif" class="walking-boy" id="cake-boy">
-    </div>
+    <div id="balloon-layer"></div>
+    <div class="character-container"><img src="boy_with_cake.gif" class="walking-boy" id="cake-boy"></div>
     <div id="cake-ui" style="display:none;">
-        <h1>May your birthday be as sweet as this cake!</h1>
-        <div id="cake-img" style="font-size: 120px; cursor: pointer;" onclick="cutCake()">🎂</div>
-        <div id="cake-msg" style="margin-top: 15px; font-weight: bold; color: var(--gold); font-size: 1.2rem;"></div>
-        <button id="cake-next-btn" class="magic-btn" style="display:none;" onclick="nextPage(3)">Open My Mail ✉️</button>
+        <h1>Sweetness for Mini!</h1>
+        <div id="cake-img" style="font-size: 120px;" onclick="cutCake()">🎂</div>
+        <p id="cake-msg" style="color: var(--gold); font-weight: bold;"></p>
+        <button id="cake-next" class="magic-btn" style="display:none" onclick="nextPage(3)">Open Mail ✉️</button>
     </div>
 </div>
 
 <div id="page3" class="page">
-    <div class="character-container">
-        <img src="boy_delivery.gif" class="walking-boy" id="letter-boy">
-    </div>
+    <div id="flower-layer"></div>
+    <div class="character-container"><img src="boy_delivery.gif" class="walking-boy" id="letter-boy"></div>
     <div id="letter-ui" style="display:none;">
-        <button class="magic-btn animate__animated animate__heartBeat animate__infinite" onclick="openLetter()">View My Message</button>
-        <div id="letter-text" style="display:none; margin-top: 20px;" class="letter-paper">
-            <h3>To My Best Friend Mini,</h3>
-            <p>You aren't just a best friend; you're the glitter in my world! I hope this surprise brings a massive smile to your face. Keep shining!</p>
-            <button class="magic-btn" onclick="nextPage(4)">Is there a Gift? 🎁</button>
+        <button class="magic-btn" onclick="openLetter()">Read My Message</button>
+        <div id="letter-text" style="display:none; background: #fffdf0; color: #333; padding: 20px; border-radius: 10px; margin-top: 20px; max-width: 85%;">
+            <h3>To Mini,</h3>
+            <p>You make every day brighter! Hope this year is your best one yet. ❤️</p>
+            <button class="magic-btn" onclick="nextPage(4)">Check Gift 🎁</button>
         </div>
     </div>
 </div>
 
 <div id="page4" class="page">
-    <div class="character-container">
-        <img src="boy_with_gifts.gif" class="walking-boy" id="gift-boy">
-    </div>
+    <div class="character-container"><img src="boy_with_gifts.gif" class="walking-boy" id="gift-boy"></div>
     <div id="gift-ui" style="display:none;">
-        <h1>Do you want this gift?</h1>
-        <button class="magic-btn" style="background: green;" onclick="showGiftFinal()">YES!</button>
-        <button id="no-btn" class="magic-btn" style="background: #444;" onmouseover="moveNo()">NO</button>
-        
-        <div id="gift-final-msg" style="display:none; margin-top: 20px;">
-            <div style="font-size: 60px;">🎁📦✨</div>
-            <h2>Your gift is on the way!</h2>
-            <p>I'm waiting to meet you with your surprise. Be ready! 😉</p>
-            <button class="magic-btn" onclick="nextPage(5)">Grand Finale 🎉</button>
+        <h1>Ready for your gift?</h1>
+        <button class="magic-btn" onclick="acceptGift()">YES!</button>
+        <button id="no-btn" class="magic-btn" style="background: #555;" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
+        <div id="gift-final" style="display:none; margin-top: 20px;">
+            <h2>Your gift is on the way! 📦</h2>
+            <p>Meet me to claim your surprise! 😉</p>
+            <button class="magic-btn" onclick="nextPage(5)">THE FINALE 🎉</button>
         </div>
     </div>
 </div>
 
 <div id="page5" class="page">
     <h1 class="glowing-text">HAPPY BIRTHDAY MINI!</h1>
-    <p style="font-size: 1.2rem; color: var(--gold);">Special Message: Pure Magic Just For You!</p>
-    <img src="our_photo.jpg" alt="Mini's Birthday" style="width: 280px; border: 8px solid white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <button class="magic-btn" onclick="location.reload()">Replay the Magic ❤️</button>
+    <p>Content: Not Available - Just Pure Love!</p>
+    <img src="our_photo.jpg" style="width: 250px; border: 5px solid white; border-radius: 10px;">
+    <button class="magic-btn" onclick="location.reload()" style="margin-top: 20px;">Replay ❤️</button>
 </div>
 
 <script>
-    const bgMusic = document.getElementById('bgMusic');
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let micStream;
+
+    function initAudio() {
+        document.getElementById('start-btn').style.display = 'none';
+        document.getElementById('candle-box').style.display = 'block';
+        document.getElementById('bgMusic').play();
+
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            micStream = stream;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaStreamSource(stream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            detectBlow();
+        }).catch(err => {
+            document.getElementById('mic-status').innerHTML = "Mic Error. Tap candles to blow!";
+            document.getElementById('candles').onclick = blowManual;
+        });
+    }
+
+    function detectBlow() {
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        let sum = dataArray.reduce((a, b) => a + b, 0);
+        let average = sum / dataArray.length;
+
+        if (average > 50) { // Threshold for blowing
+            blowManual();
+        } else {
+            requestAnimationFrame(detectBlow);
+        }
+    }
+
+    function blowManual() {
+        document.getElementById('candles').innerHTML = "💨🕯️";
+        document.getElementById('candles').style.opacity = "0.5";
+        document.getElementById('wish-box').style.display = "block";
+        document.getElementById('mic-status').innerText = "Blown! 🌬️";
+        if (micStream) micStream.getTracks().forEach(track => track.stop());
+    }
 
     function nextPage(n) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page'+n).classList.add('active');
-        
-        if(n === 2) triggerBoy('cake-boy', 'cake-ui');
-        if(n === 3) triggerBoy('letter-boy', 'letter-ui');
-        if(n === 4) triggerBoy('gift-boy', 'gift-ui');
-        if(n === 5) startFinale();
+        if(n === 2) { triggerBoy('cake-boy', 'cake-ui'); createBalloons(); }
+        if(n === 3) { triggerBoy('letter-boy', 'letter-ui'); createFlowers(); }
+        if(n === 4) { triggerBoy('gift-boy', 'gift-ui'); }
+        if(n === 5) { startFinale(); }
     }
 
     function triggerBoy(boyId, uiId) {
-        const boy = document.getElementById(boyId);
-        setTimeout(() => { boy.classList.add('walk-in'); }, 100);
-        setTimeout(() => { document.getElementById(uiId).style.display = 'block'; }, 2500);
-    }
-
-    // Mic Blow Logic
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        bgMusic.play();
-        const audioCtx = new AudioContext();
-        const analyser = audioCtx.createAnalyser();
-        const mic = audioCtx.createMediaStreamSource(stream);
-        mic.connect(analyser);
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        function detect() {
-            analyser.getByteFrequencyData(data);
-            let volume = data.reduce((a, b) => a + b) / data.length;
-            if(volume > 45) {
-                document.getElementById('candles').innerHTML = "💨🕯️";
-                document.getElementById('candles').style.opacity = '0.5';
-                document.getElementById('wish-box').style.display = 'block';
-                document.getElementById('mic-hint').innerText = "Blow detected! ✨";
-            }
-            requestAnimationFrame(detect);
-        }
-        detect();
-    }).catch(() => {
-        document.getElementById('mic-hint').innerHTML = "<button class='magic-btn' onclick='blowManual()'>Tap to Blow Candles</button>";
-    });
-
-    function blowManual() {
-        document.getElementById('candles').innerHTML = "💨🕯️";
-        document.getElementById('wish-box').style.display = 'block';
+        setTimeout(() => { document.getElementById(boyId).classList.add('walk-in'); }, 100);
+        setTimeout(() => { document.getElementById(uiId).style.display = 'block'; }, 2800);
     }
 
     function cutCake() {
         document.getElementById('cake-img').innerHTML = "🍰🍴";
         document.getElementById('cake-msg').innerText = "Oh! It's butterscotch cake, hope you loved it.";
-        document.getElementById('cake-next-btn').style.display = 'inline-block';
+        document.getElementById('cake-next').style.display = "inline-block";
         confetti();
     }
 
     function openLetter() {
-        document.getElementById('letter-text').style.display = 'block';
+        document.getElementById('letter-text').style.display = "block";
         confetti({particleCount: 100});
     }
 
@@ -167,16 +179,49 @@
         btn.style.top = Math.random() * 70 + '%';
     }
 
-    function showGiftFinal() {
-        document.getElementById('gift-final-msg').style.display = 'block';
-        document.getElementById('no-btn').style.display = 'none';
+    function acceptGift() {
+        document.getElementById('gift-final').style.display = "block";
+        document.getElementById('no-btn').style.display = "none";
         confetti();
+    }
+
+    // --- Visual Effects ---
+    function createBalloons() {
+        for(let i=0; i<10; i++){
+            let b = document.createElement('div');
+            b.className = 'balloon';
+            b.innerHTML = ['🎈','💖','🔵','🟡'][Math.floor(Math.random()*4)];
+            b.style.left = Math.random() * 90 + 'vw';
+            b.style.animationDelay = Math.random() * 5 + 's';
+            document.getElementById('balloon-layer').appendChild(b);
+        }
+    }
+
+    function createFlowers() {
+        for(let i=0; i<15; i++){
+            let f = document.createElement('div');
+            f.className = 'flower';
+            f.innerHTML = ['🌸','🌺','🌷'][Math.floor(Math.random()*3)];
+            f.style.left = Math.random() * 95 + 'vw';
+            f.style.animationDelay = Math.random() * 5 + 's';
+            document.getElementById('flower-layer').appendChild(f);
+        }
     }
 
     function startFinale() {
         setInterval(() => {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        }, 1500);
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+        }, 2000);
+    }
+
+    // Glitter Background
+    for(let i=0; i<40; i++) {
+        let g = document.createElement('div');
+        g.className = 'glitter';
+        g.style.left = Math.random()*100+'vw';
+        g.style.top = Math.random()*100+'vh';
+        g.style.animationDelay = Math.random()*3+'s';
+        document.getElementById('glitter-layer').appendChild(g);
     }
 </script>
 </body>
