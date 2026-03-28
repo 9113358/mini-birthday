@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Celestial Surprise for Mini ✨</title>
+    <title>A Celestial Surprise for Manorama ✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
@@ -46,7 +46,7 @@
 <audio id="bgMusic" loop src="birthday_song.mp3"></audio>
 
 <div id="page1" class="page active">
-    <h1 class="animate__animated animate__zoomIn">Your Special Day is Here, Mini! ✨</h1>
+    <h1 class="animate__animated animate__zoomIn">Your Special Day is Here, Manorama! ✨</h1>
     <div id="setup-ui">
         <p style="font-size: 1.2rem; margin-bottom: 20px;">The stars have aligned for you.</p>
         <button class="magic-btn" onclick="startMic()">Enter the Magic</button>
@@ -59,7 +59,7 @@
     </div>
 
     <div id="wish-box" style="display:none;" class="animate__animated animate__fadeInUp">
-        <h2 style="color: var(--gold); font-size: 2rem;">"Wishing you many more candles to blow and a year filled with joy."</h2>
+        <h2 style="color: var(--gold); font-size: 2rem;">"Many more candles, many more wishes 🎁🕯️ May this year bring you nothing but joy, smiles, and amazing moments 💛"</h2>
         <button class="magic-btn" onclick="nextPage(2)">Continue →</button>
     </div>
 </div>
@@ -70,17 +70,17 @@
         <div class="cake-instruction">✨ Let's celebrate! Cut the cake to taste... ✨</div>
         <div id="cake-img" style="font-size: 150px; cursor: pointer; transition: 0.5s;" onclick="cutCake()">🎂</div>
         <p id="cake-msg" style="color: #fff; font-weight: bold; font-size: 1.3rem; margin-top: 20px;"></p>
-        <button id="cake-next" class="magic-btn" style="display:none; margin-top: 20px;" onclick="nextPage(3)">Open My Mail ✉️</button>
+        <button id="cake-next" class="magic-btn" style="display:none; margin-top: 20px;" onclick="nextPage(3)">Your special note is here! ✉️</button>
     </div>
 </div>
 
 <div id="page3" class="page">
     <div class="character-container"><img src="boy_delivery.gif" class="walking-boy" id="letter-boy"></div>
     <div id="letter-ui" style="display:none;">
-        <button class="magic-btn animate__animated animate__heartBeat animate__infinite" onclick="openLetter()">A Message from My Heart</button>
+        <button class="magic-btn animate__animated animate__heartBeat animate__infinite" onclick="openLetter()">A Little Message for My Best Friend 💫</button>
         <div id="letter-text" style="display:none; background: #fffdf0; color: #333; padding: 30px; border-radius: 15px; margin-top: 20px; max-width: 80%; border-left: 10px solid var(--pink); box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
-            <h3 style="color: var(--pink); font-size: 1.8rem;">Dear Mini,</h3>
-            <p style="font-size: 1.2rem;">You are a star that shines brighter than any other in this universe. May your life be as beautiful as tonight. Happy Birthday! ❤️</p>
+            <h3 style="color: var(--pink); font-size: 1.8rem;">Dear Manorama,</h3>
+            <p style="font-size: 1.2rem;">Wishing you a very happy birthday, bestie! 🎉 You’ve always been such a strong and genuine person 🤝, and I truly respect that 💫 I’m lucky to call you my best friend 🤍 Hope your year is filled with positivity, happiness 🥳, laughter, and everything that makes you happy 😊✨ </p>
             <button class="magic-btn" onclick="nextPage(4)">Wait... is there a gift? 🎁</button>
         </div>
     </div>
@@ -89,24 +89,24 @@
 <div id="page4" class="page">
     <div class="character-container"><img src="boy_with_gifts.gif" class="walking-boy" id="gift-boy"></div>
     <div id="gift-ui" style="display:none;">
-        <h1 class="animate__animated animate__fadeIn">Will you accept your gift?</h1>
+        <h1 class="animate__animated animate__fadeIn">Ready for your gift? 🎁</h1>
         <button class="magic-btn" onclick="acceptGift()">YES, OPEN!</button>
         <button id="no-btn" class="magic-btn" style="background: #333; opacity: 0.7;" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
         <div id="gift-final" style="display:none; margin-top: 30px;">
             <div style="font-size: 80px;">📦🎁✨</div>
-            <h2 class="animate__animated animate__bounceIn">Your real gift is on the way!</h2>
-            <p>I'm waiting to meet you to deliver the surprise. 😉</p>
+            <h2 class="animate__animated animate__bounceIn">Your real gift is on the way!🎁✨</h2>
+            <p>Guess what? I'm waiting to meet you to deliver the surprise. 😉</p>
             <button class="magic-btn" onclick="nextPage(5)">THE GRAND FINALE 🎉</button>
         </div>
     </div>
 </div>
 
 <div id="page5" class="page">
-    <h1 class="glowing-text">HAPPY BIRTHDAY MINI!</h1>
+    <h1 class="glowing-text">HAPPY BIRTHDAY MANORAMA!</h1>
     <div style="margin: 20px 0;">
         <img src="our_photo.jpg" style="width: 300px; border: 10px solid white; border-radius: 20px; box-shadow: 0 0 50px var(--gold);">
     </div>
-    <p style="font-size: 1.5rem; color: var(--gold); text-shadow: 0 0 10px gold;">You are truly one in a billion!</p>
+    <p style="font-size: 1.5rem; color: var(--gold); text-shadow: 0 0 10px gold;">Wishing you a day full of happiness and a year full of success and smiles!</p>
     <button class="magic-btn" onclick="location.reload()" style="margin-top: 20px;">Replay the Magic ❤️</button>
 </div>
 
