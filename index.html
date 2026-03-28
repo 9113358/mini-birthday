@@ -7,32 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #1a0033; --sparkle: rgba(255, 255, 255, 0.8); }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--royal); color: white; font-family: 'Poppins', sans-serif; touch-action: manipulation; }
+        :root { --gold: #FFD700; --pink: #FF69B4; --royal: #1a0033; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--royal); color: white; font-family: 'Poppins', sans-serif; }
 
         .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; background: radial-gradient(circle, #2e004e 0%, #110022 100%); z-index: 10; }
         .active { display: flex; }
 
-        /* --- New Magical Elements --- */
-        .balloon { position: absolute; bottom: -100px; font-size: 40px; animation: floatUp 8s linear infinite; z-index: 5; pointer-events: none; }
-        @keyframes floatUp { to { transform: translateY(-120vh) translateX(50px); opacity: 0; } }
+        /* Smoke/Cloud Effect */
+        .smoke-wrap { position: absolute; bottom: 0; width: 100%; height: 200px; overflow: hidden; pointer-events: none; opacity: 0.4; }
+        .smoke { position: absolute; bottom: -50px; width: 300px; height: 300px; background: radial-gradient(circle, #ffffff33 0%, #ffffff00 70%); border-radius: 50%; filter: blur(30px); animation: smokeMove 8s infinite alternate; }
+        @keyframes smokeMove { from { transform: translateX(-100px); } to { transform: translateX(100vw); } }
 
-        .flower { position: absolute; top: -50px; font-size: 25px; animation: petalFall 6s linear infinite; z-index: 5; pointer-events: none; }
-        @keyframes petalFall { to { transform: translateY(110vh) rotate(360deg); } }
+        /* Characters */
+        .character-container { position: relative; width: 220px; height: 220px; overflow: hidden; }
+        .walking-boy { width: 180px; position: absolute; left: -300px; transition: left 3.5s ease-out; z-index: 20; }
+        .walk-in { left: 20px !important; }
 
-        .glitter { position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; opacity: 0; animation: flash 3s infinite; pointer-events: none; }
-        @keyframes flash { 0%, 100% { opacity: 0; } 50% { opacity: 1; box-shadow: 0 0 10px white; } }
-
-        /* Character & UI */
-        .character-container { position: relative; width: 200px; height: 200px; overflow: hidden; }
-        .walking-boy { width: 150px; position: absolute; left: -300px; transition: left 3s ease-out; }
-        .walk-in { left: 25px !important; }
+        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 18px 45px; color: white; font-size: 1.2rem; border-radius: 50px; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--pink); font-weight: bold; }
+        
+        /* Floating Icons */
+        .float-item { position: absolute; pointer-events: none; z-index: 5; animation: floatUp 7s linear infinite; }
+        @keyframes floatUp { 0% { bottom: -10%; opacity: 1; } 100% { bottom: 110%; opacity: 0; } }
 
         .cake-page { cursor: url('knife.png'), pointer !important; }
-        .magic-btn { background: linear-gradient(45deg, var(--pink), var(--gold)); border: none; padding: 15px 35px; color: white; font-size: 1rem; border-radius: 50px; cursor: pointer; z-index: 100; box-shadow: 0 0 15px var(--pink); }
-
-        .glowing-text { font-size: 3.5rem; text-shadow: 0 0 10px #fff, 0 0 20px var(--pink); animation: pulse 2s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .glowing-text { font-size: 3rem; text-shadow: 0 0 15px var(--pink); animation: pulse 2s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.08); } }
     </style>
 </head>
 <body>
@@ -40,28 +39,32 @@
 <audio id="bgMusic" loop src="birthday_song.mp3"></audio>
 
 <div id="page1" class="page active">
-    <div id="glitter-layer"></div>
-    <h1 class="animate__animated animate__fadeInDown">Happy Birthday, Mini! ✨</h1>
-    <p>Tap "Start" then <b>BLOW</b> into the mic!</p>
-    <button class="magic-btn" id="start-btn" onclick="initAudio()">Start Magic 🎙️</button>
-    <div id="candle-box" style="display:none;">
-        <div id="candles" style="font-size: 80px;">🕯️🕯️🕯️</div>
-        <p id="mic-status" style="color: var(--gold);">Waiting for your breath...</p>
+    <h1 class="animate__animated animate__fadeIn">Welcome, Mini! ✨</h1>
+    <div id="setup-ui">
+        <p>This surprise needs your voice & magic.</p>
+        <button class="magic-btn" onclick="startMic()">START THE MAGIC</button>
     </div>
+    
+    <div id="mic-ui" style="display:none;">
+        <div id="candles" style="font-size: 80px; margin-bottom: 10px;">🕯️🕯️🕯️</div>
+        <p id="mic-hint">Now... <b>BLOW</b> at the bottom of your phone!</p>
+        <div id="mic-status" style="font-size: 0.9rem; color: var(--gold);">Waiting for breath...</div>
+    </div>
+
     <div id="wish-box" style="display:none;" class="animate__animated animate__zoomIn">
-        <h2>"Wishing you many more candles to blow and a year filled with joy."</h2>
-        <button class="magic-btn" onclick="nextPage(2)">Open Surprise →</button>
+        <h2 style="padding: 20px;">"Wishing you many more candles to blow and a year filled with joy."</h2>
+        <button class="magic-btn" onclick="nextPage(2)">Continue →</button>
     </div>
 </div>
 
 <div id="page2" class="page cake-page">
-    <div id="balloon-layer"></div>
+    <div class="smoke-wrap"><div class="smoke"></div><div class="smoke" style="animation-delay: 4s;"></div></div>
     <div class="character-container"><img src="boy_with_cake.gif" class="walking-boy" id="cake-boy"></div>
     <div id="cake-ui" style="display:none;">
-        <h1>Sweetness for Mini!</h1>
-        <div id="cake-img" style="font-size: 120px;" onclick="cutCake()">🎂</div>
-        <p id="cake-msg" style="color: var(--gold); font-weight: bold;"></p>
-        <button id="cake-next" class="magic-btn" style="display:none" onclick="nextPage(3)">Open Mail ✉️</button>
+        <h1>A Sweet Surprise!</h1>
+        <div id="cake-img" style="font-size: 130px; cursor: pointer;" onclick="cutCake()">🎂</div>
+        <p id="cake-msg" style="color: var(--gold); font-weight: bold; font-size: 1.2rem;"></p>
+        <button id="cake-next" class="magic-btn" style="display:none" onclick="nextPage(3)">Next ✉️</button>
     </div>
 </div>
 
@@ -70,9 +73,9 @@
     <div class="character-container"><img src="boy_delivery.gif" class="walking-boy" id="letter-boy"></div>
     <div id="letter-ui" style="display:none;">
         <button class="magic-btn" onclick="openLetter()">Read My Message</button>
-        <div id="letter-text" style="display:none; background: #fffdf0; color: #333; padding: 20px; border-radius: 10px; margin-top: 20px; max-width: 85%;">
-            <h3>To Mini,</h3>
-            <p>You make every day brighter! Hope this year is your best one yet. ❤️</p>
+        <div id="letter-text" style="display:none; background: #fffdf0; color: #333; padding: 25px; border-radius: 12px; margin-top: 20px; max-width: 85%; border-left: 8px solid var(--pink);">
+            <h3>To My Bestie Mini,</h3>
+            <p>You make the world better just by being in it! Happy Birthday! ❤️</p>
             <button class="magic-btn" onclick="nextPage(4)">Check Gift 🎁</button>
         </div>
     </div>
@@ -81,12 +84,12 @@
 <div id="page4" class="page">
     <div class="character-container"><img src="boy_with_gifts.gif" class="walking-boy" id="gift-boy"></div>
     <div id="gift-ui" style="display:none;">
-        <h1>Ready for your gift?</h1>
+        <h1>Open your gift?</h1>
         <button class="magic-btn" onclick="acceptGift()">YES!</button>
-        <button id="no-btn" class="magic-btn" style="background: #555;" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
+        <button id="no-btn" class="magic-btn" style="background: #444;" onmouseover="moveNo()" ontouchstart="moveNo()">NO</button>
         <div id="gift-final" style="display:none; margin-top: 20px;">
             <h2>Your gift is on the way! 📦</h2>
-            <p>Meet me to claim your surprise! 😉</p>
+            <p>Ready to meet me for the real surprise? 😉</p>
             <button class="magic-btn" onclick="nextPage(5)">THE FINALE 🎉</button>
         </div>
     </div>
@@ -94,44 +97,47 @@
 
 <div id="page5" class="page">
     <h1 class="glowing-text">HAPPY BIRTHDAY MINI!</h1>
-    <p>Content: Not Available - Just Pure Love!</p>
-    <img src="our_photo.jpg" style="width: 250px; border: 5px solid white; border-radius: 10px;">
-    <button class="magic-btn" onclick="location.reload()" style="margin-top: 20px;">Replay ❤️</button>
+    <p>Content: Not Available - Pure Magic Only!</p>
+    <img src="our_photo.jpg" style="width: 280px; border: 8px solid white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <button class="magic-btn" onclick="location.reload()" style="margin-top: 25px;">Replay ❤️</button>
 </div>
 
 <script>
-    let audioContext;
+    let audioCtx;
     let analyser;
-    let dataArray;
-    let micStream;
+    let data;
 
-    function initAudio() {
-        document.getElementById('start-btn').style.display = 'none';
-        document.getElementById('candle-box').style.display = 'block';
+    function startMic() {
+        document.getElementById('setup-ui').style.display = 'none';
+        document.getElementById('mic-ui').style.display = 'block';
         document.getElementById('bgMusic').play();
 
+        // Mobile Fix: Initialize Audio Context on user click
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
         navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            micStream = stream;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(stream);
-            analyser = audioContext.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(stream);
+            analyser = audioCtx.createAnalyser();
             analyser.fftSize = 256;
             source.connect(analyser);
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            data = new Uint8Array(analyser.frequencyBinCount);
             detectBlow();
         }).catch(err => {
-            document.getElementById('mic-status').innerHTML = "Mic Error. Tap candles to blow!";
+            document.getElementById('mic-status').innerHTML = "Mic Blocked. Tap candles to blow!";
             document.getElementById('candles').onclick = blowManual;
         });
     }
 
     function detectBlow() {
-        if (!analyser) return;
-        analyser.getByteFrequencyData(dataArray);
-        let sum = dataArray.reduce((a, b) => a + b, 0);
-        let average = sum / dataArray.length;
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for(let i=0; i<data.length; i++) sum += data[i];
+        let average = sum / data.length;
 
-        if (average > 50) { // Threshold for blowing
+        // Visual feedback
+        if(average > 10) document.getElementById('mic-status').innerText = "Hearing something...";
+
+        if (average > 35) { // Lowered threshold for mobile
             blowManual();
         } else {
             requestAnimationFrame(detectBlow);
@@ -140,24 +146,23 @@
 
     function blowManual() {
         document.getElementById('candles').innerHTML = "💨🕯️";
-        document.getElementById('candles').style.opacity = "0.5";
         document.getElementById('wish-box').style.display = "block";
-        document.getElementById('mic-status').innerText = "Blown! 🌬️";
-        if (micStream) micStream.getTracks().forEach(track => track.stop());
+        document.getElementById('mic-ui').style.display = "none";
+        confetti();
     }
 
     function nextPage(n) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page'+n).classList.add('active');
-        if(n === 2) { triggerBoy('cake-boy', 'cake-ui'); createBalloons(); }
-        if(n === 3) { triggerBoy('letter-boy', 'letter-ui'); createFlowers(); }
+        if(n === 2) { triggerBoy('cake-boy', 'cake-ui'); spawnItems(['🎈','💖','🎈'], 'page2'); }
+        if(n === 3) { triggerBoy('letter-boy', 'letter-ui'); spawnItems(['🌸','🌺','✨'], 'page3'); }
         if(n === 4) { triggerBoy('gift-boy', 'gift-ui'); }
-        if(n === 5) { startFinale(); }
+        if(n === 5) { setInterval(() => confetti({particleCount: 100, spread: 70, origin: {y: 0.6}}), 2000); }
     }
 
     function triggerBoy(boyId, uiId) {
-        setTimeout(() => { document.getElementById(boyId).classList.add('walk-in'); }, 100);
-        setTimeout(() => { document.getElementById(uiId).style.display = 'block'; }, 2800);
+        setTimeout(() => { document.getElementById(boyId).classList.add('walk-in'); }, 200);
+        setTimeout(() => { document.getElementById(uiId).style.display = 'block'; }, 3000);
     }
 
     function cutCake() {
@@ -169,7 +174,7 @@
 
     function openLetter() {
         document.getElementById('letter-text').style.display = "block";
-        confetti({particleCount: 100});
+        confetti();
     }
 
     function moveNo() {
@@ -185,43 +190,17 @@
         confetti();
     }
 
-    // --- Visual Effects ---
-    function createBalloons() {
-        for(let i=0; i<10; i++){
-            let b = document.createElement('div');
-            b.className = 'balloon';
-            b.innerHTML = ['🎈','💖','🔵','🟡'][Math.floor(Math.random()*4)];
-            b.style.left = Math.random() * 90 + 'vw';
-            b.style.animationDelay = Math.random() * 5 + 's';
-            document.getElementById('balloon-layer').appendChild(b);
+    function spawnItems(icons, pageId) {
+        const page = document.getElementById(pageId);
+        for(let i=0; i<15; i++) {
+            let item = document.createElement('div');
+            item.className = 'float-item';
+            item.innerHTML = icons[Math.floor(Math.random()*icons.length)];
+            item.style.left = Math.random() * 90 + 'vw';
+            item.style.animationDelay = Math.random() * 5 + 's';
+            item.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            page.appendChild(item);
         }
-    }
-
-    function createFlowers() {
-        for(let i=0; i<15; i++){
-            let f = document.createElement('div');
-            f.className = 'flower';
-            f.innerHTML = ['🌸','🌺','🌷'][Math.floor(Math.random()*3)];
-            f.style.left = Math.random() * 95 + 'vw';
-            f.style.animationDelay = Math.random() * 5 + 's';
-            document.getElementById('flower-layer').appendChild(f);
-        }
-    }
-
-    function startFinale() {
-        setInterval(() => {
-            confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-        }, 2000);
-    }
-
-    // Glitter Background
-    for(let i=0; i<40; i++) {
-        let g = document.createElement('div');
-        g.className = 'glitter';
-        g.style.left = Math.random()*100+'vw';
-        g.style.top = Math.random()*100+'vh';
-        g.style.animationDelay = Math.random()*3+'s';
-        document.getElementById('glitter-layer').appendChild(g);
     }
 </script>
 </body>
