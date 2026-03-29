@@ -19,6 +19,12 @@
         .page { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: absolute; z-index: 10; }
         .active { display: flex; }
 
+        /* Countdown Styles */
+        #countdown-container { background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 2px solid var(--gold); margin-top: 20px; box-shadow: 0 0 20px var(--gold); }
+        .timer-grid { display: flex; gap: 20px; justify-content: center; margin-top: 15px; }
+        .timer-box { font-size: 2rem; font-weight: bold; color: var(--gold); }
+        .timer-label { font-size: 0.8rem; color: white; text-transform: uppercase; display: block; }
+
         /* Character & Animation */
         .character-container { position: relative; width: 250px; height: 250px; margin-bottom: 20px; }
         .walking-boy { width: 200px; position: absolute; left: -400px; transition: left 3.5s cubic-bezier(0.25, 0.1, 0.25, 1); filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
@@ -32,9 +38,6 @@
         .magic-btn { background: linear-gradient(45deg, #ff0080, #ffd700); border: none; padding: 18px 50px; color: white; font-size: 1.3rem; border-radius: 50px; cursor: pointer; z-index: 100; font-weight: bold; box-shadow: 0 10px 20px rgba(255,0,128,0.3); transition: 0.3s; }
         .magic-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 15px 30px var(--pink); }
 
-        /* Knife Cursor for Cake Page */
-        .cake-page { cursor: url('knife.png'), auto !important; }
-
         /* Finale Text */
         .glowing-text { font-size: 4rem; font-weight: 900; background: linear-gradient(to right, #fff, var(--gold), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px var(--gold)); animation: glow 2s infinite alternate; }
         @keyframes glow { from { filter: drop-shadow(0 0 10px var(--gold)); } to { filter: drop-shadow(0 0 30px var(--pink)); } }
@@ -46,8 +49,19 @@
 <audio id="bgMusic" loop src="birthday_song.mp3"></audio>
 
 <div id="page1" class="page active">
-    <h1 class="animate__animated animate__zoomIn">Your Special Day is Here, Manorama! ✨</h1>
-    <div id="setup-ui">
+    <h1 class="animate__animated animate__zoomIn">Your Special Day is Approaching, Manorama! ✨</h1>
+    
+    <div id="countdown-container" class="animate__animated animate__fadeIn">
+        <p>The magic unfolds in...</p>
+        <div class="timer-grid">
+            <div class="timer-box"><span id="days">00</span><span class="timer-label">Days</span></div>
+            <div class="timer-box"><span id="hours">00</span><span class="timer-label">Hrs</span></div>
+            <div class="timer-box"><span id="mins">00</span><span class="timer-label">Mins</span></div>
+            <div class="timer-box"><span id="secs">00</span><span class="timer-label">Secs</span></div>
+        </div>
+    </div>
+
+    <div id="setup-ui" style="display:none;">
         <p style="font-size: 1.2rem; margin-bottom: 20px;">The stars have aligned for you.</p>
         <button class="magic-btn" onclick="startMic()">Enter the Magic</button>
     </div>
@@ -125,7 +139,32 @@
         starField.appendChild(star);
     }
 
-    // --- 2. VIBRATION & AUDIO ---
+    // --- 2. COUNTDOWN LOGIC ---
+    const targetDate = new Date("March 30, 2026 00:00:00").getTime();
+
+    const timerInterval = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+        document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+        document.getElementById("mins").innerHTML = minutes.toString().padStart(2, '0');
+        document.getElementById("secs").innerHTML = seconds.toString().padStart(2, '0');
+
+        if (distance < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("countdown-container").style.display = "none";
+            document.getElementById("setup-ui").style.display = "block";
+            document.querySelector("#page1 h1").innerHTML = "Your Special Day is Here, Manorama! ✨";
+        }
+    }, 1000);
+
+    // --- 3. VIBRATION & AUDIO ---
     function vibrate(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
     let audioCtx, analyser, data;
 
@@ -164,7 +203,7 @@
         confetti({particleCount: 150, spread: 80, origin: {y: 0.6}, colors: ['#ffd700', '#ffffff']});
     }
 
-    // --- 3. DAZZLING NAVIGATION ---
+    // --- 4. NAVIGATION & ACTIONS ---
     function nextPage(n) {
         vibrate(50);
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
